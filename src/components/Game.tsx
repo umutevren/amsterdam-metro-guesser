@@ -64,10 +64,8 @@ const Game = () => {
   });
 
   const [showConfetti, setShowConfetti] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     startNewGame();
   }, []);
 
@@ -111,10 +109,6 @@ const Game = () => {
       setViewState(prev => ({ ...prev, zoom: newZoomLevel }));
     }
   };
-
-  if (!isMounted) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="h-screen flex flex-col">
