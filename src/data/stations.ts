@@ -43,6 +43,6 @@ export const metroStations: MetroStation[] = [
   },
 ];
 
-export const INITIAL_ZOOM = 16;
-export const ZOOM_DECREASE = 1;
+export const INITIAL_ZOOM = 18;
+export const ZOOM_DECREASE = 2;
 export const MIN_ZOOM = 13; 

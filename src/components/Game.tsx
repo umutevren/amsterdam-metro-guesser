@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { TileLayer, Marker, useMap } from 'react-leaflet';
 import dynamic from 'next/dynamic';
 import { metroStations, INITIAL_ZOOM, ZOOM_DECREASE, MIN_ZOOM } from '../data/stations';
@@ -64,6 +64,8 @@ const Game = () => {
   });
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [guess, setGuess] = useState('');
+  const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
     startNewGame();
@@ -85,20 +87,27 @@ const Game = () => {
       zoom: INITIAL_ZOOM,
     });
     setShowConfetti(false);
+    setGuess('');
+    setFeedback('');
   };
 
-  const handleGuess = (stationName: string) => {
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
     if (!gameState.currentStation || gameState.gameOver) return;
 
-    const isCorrect = stationName.toLowerCase() === gameState.currentStation.name.toLowerCase();
+    const normalizedGuess = guess.toLowerCase().trim();
+    const normalizedAnswer = gameState.currentStation.name.toLowerCase();
+    const isCorrect = normalizedGuess === normalizedAnswer;
     const newAttempts = gameState.attempts + 1;
 
     if (isCorrect) {
       setGameState(prev => ({ ...prev, isCorrect: true, gameOver: true }));
       setShowConfetti(true);
+      setFeedback('🎉 Correct! Well done!');
       setTimeout(() => setShowConfetti(false), 5000);
     } else if (newAttempts >= gameState.maxAttempts) {
       setGameState(prev => ({ ...prev, gameOver: true }));
+      setFeedback(`❌ Game Over! The correct answer was ${gameState.currentStation.name}`);
     } else {
       const newZoomLevel = Math.max(gameState.zoomLevel - ZOOM_DECREASE, MIN_ZOOM);
       setGameState(prev => ({
@@ -107,7 +116,9 @@ const Game = () => {
         zoomLevel: newZoomLevel,
       }));
       setViewState(prev => ({ ...prev, zoom: newZoomLevel }));
+      setFeedback(`❌ Wrong guess! ${gameState.maxAttempts - newAttempts} attempts remaining`);
     }
+    setGuess('');
   };
 
   return (
@@ -148,39 +159,46 @@ const Game = () => {
       </div>
 
       <div className="p-4 bg-white shadow-lg">
-        <div className="flex flex-wrap gap-2 mb-4">
-          {metroStations.map(station => (
-            <button
-              key={station.id}
-              onClick={() => handleGuess(station.name)}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder="Enter station name..."
               disabled={gameState.gameOver}
-              className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+            />
+            <button
+              type="submit"
+              disabled={gameState.gameOver || !guess.trim()}
+              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 transition-colors"
             >
-              {station.name}
+              Guess
             </button>
-          ))}
-        </div>
-
-        <div className="flex justify-between items-center">
-          <div>
-            Attempts: {gameState.attempts}/{gameState.maxAttempts}
           </div>
-          {gameState.gameOver && (
+
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <p className={gameState.isCorrect ? "text-green-500" : "text-red-500"}>
-                {gameState.isCorrect 
-                  ? "Congratulations! You found it!" 
-                  : `The correct station was ${gameState.currentStation?.name}`}
-              </p>
+              <span className="text-gray-600">
+                Attempts: {gameState.attempts}/{gameState.maxAttempts}
+              </span>
+              {feedback && (
+                <span className={gameState.isCorrect ? "text-green-500" : "text-red-500"}>
+                  {feedback}
+                </span>
+              )}
+            </div>
+            {gameState.gameOver && (
               <button
                 onClick={startNewGame}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
               >
                 Play Again
               </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
