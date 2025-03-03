@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Map, { Marker, MapLayerMouseEvent } from 'react-map-gl';
+import Map, { MapRef, Marker } from 'react-map-gl';
+import type { ViewStateChangeEvent } from 'react-map-gl';
 import ReactConfetti from 'react-confetti';
 import { metroStations, INITIAL_ZOOM, ZOOM_DECREASE, MIN_ZOOM } from '../data/stations';
 import type { MetroStation, GameState, ViewState } from '../types/game';
@@ -79,7 +80,7 @@ const Game = () => {
       <div className="flex-1 relative">
         <Map
           {...viewState}
-          onMove={(evt: MapLayerMouseEvent) => setViewState(evt.viewState)}
+          onMove={(evt: ViewStateChangeEvent) => setViewState(evt.viewState)}
           style={{ width: '100%', height: '100%' }}
           mapStyle="mapbox://styles/mapbox/light-v11"
           mapboxAccessToken={MAPBOX_TOKEN}

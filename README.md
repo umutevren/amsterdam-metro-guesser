@@ -15,8 +15,8 @@ It's pretty simple really - I'll show you a zoomed-in view of a metro station so
 1. First, grab yourself a Mapbox token from [here](https://account.mapbox.com/)
 2. Clone this bad boy:
    ```bash
-   git clone [your-repo-url]
-   cd adam-metro
+   git clone https://github.com/umutevren/amsterdam-metro-guesser.git
+   cd amsterdam-metro-guesser
    ```
 3. Create a `.env.local` file and drop your Mapbox token in there:
    ```
