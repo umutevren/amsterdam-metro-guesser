@@ -8,35 +8,40 @@ It's pretty simple really - I'll show you a zoomed-in view of a metro station so
 
 - 🎯 You get 3 shots at guessing the right station
 - 🔍 Each wrong guess? The map zooms out a bit to give you more context
+- 🗺️ Street names are visible to help you navigate
 - 🎉 Get it right and... CONFETTI! (because who doesn't love confetti?)
 
 ## 🚀 Wanna Try It Out?
 
-1. First, grab yourself a Mapbox token from [here](https://account.mapbox.com/)
-2. Clone this bad boy:
+1. Clone this bad boy:
    ```bash
    git clone https://github.com/umutevren/amsterdam-metro-guesser.git
    cd amsterdam-metro-guesser
    ```
-3. Create a `.env.local` file and drop your Mapbox token in there:
-   ```
-   NEXT_PUBLIC_MAPBOX_TOKEN=your_super_secret_token
-   ```
-4. Install the goodies:
+2. Install the goodies:
    ```bash
    npm install
    ```
-5. Fire it up!
+3. Fire it up!
    ```bash
    npm run dev
    ```
 
+## 🎯 How to Play
+
+1. You'll start with a super zoomed-in view of a metro station
+2. Type your guess in the input field
+3. If you're wrong, the map zooms out to show more of the surroundings
+4. Keep trying until you get it right or run out of attempts!
+
 ## 🛠 Built With
 
-- Next.js (because it's awesome)
+- Next.js 13+ (App Router goodness!)
 - TypeScript (keeping things type-safe, you know?)
-- Mapbox (for those sweet, sweet maps)
+- OpenStreetMap (for those beautiful, detailed maps)
+- React-Leaflet (making maps fun in React)
 - React-Confetti (for the joy of victory!)
+- Tailwind CSS (for that sleek look)
 - Love for Amsterdam's metro system 💙
 
 ## 🎨 Want to Make It Better?
