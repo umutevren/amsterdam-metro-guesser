@@ -4,12 +4,16 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import ReactConfetti from 'react-confetti';
 import { metroStations, INITIAL_ZOOM, ZOOM_DECREASE, MIN_ZOOM } from '../data/stations';
-import type { MetroStation, GameState, ViewState } from '../types/game';
+import type { GameState, ViewState } from '../types/game';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+interface IconDefault extends L.Icon.Default {
+  _getIconUrl?: string;
+}
+
+delete (L.Icon.Default.prototype as IconDefault)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'marker-icon-2x.png',
   iconUrl: 'marker-icon.png',
