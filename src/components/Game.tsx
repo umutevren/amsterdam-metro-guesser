@@ -13,7 +13,9 @@ interface IconDefault extends L.Icon.Default {
   _getIconUrl?: string;
 }
 
-delete (L.Icon.Default.prototype as IconDefault)._getIconUrl;
+const iconDefault = L.Icon.Default.prototype as IconDefault;
+delete iconDefault._getIconUrl;
+
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'marker-icon-2x.png',
   iconUrl: 'marker-icon.png',
