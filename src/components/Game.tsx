@@ -1,14 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Map, { MapRef, Marker } from 'react-map-gl';
-import type { ViewStateChangeEvent } from 'react-map-gl';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import ReactConfetti from 'react-confetti';
 import { metroStations, INITIAL_ZOOM, ZOOM_DECREASE, MIN_ZOOM } from '../data/stations';
 import type { MetroStation, GameState, ViewState } from '../types/game';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+// Fix for default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'marker-icon-2x.png',
+  iconUrl: 'marker-icon.png',
+  shadowUrl: 'marker-shadow.png',
+});
+
+// Custom marker icon
+const icon = L.divIcon({
+  className: 'w-6 h-6 bg-red-500 rounded-full border-2 border-white shadow-lg',
+  iconSize: [24, 24],
+});
+
+// Component to handle map view updates
+const MapController = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [map, center, zoom]);
+  return null;
+};
 
 const Game = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -78,21 +99,36 @@ const Game = () => {
       {showConfetti && <ReactConfetti />}
       
       <div className="flex-1 relative">
-        <Map
-          {...viewState}
-          onMove={(evt: ViewStateChangeEvent) => setViewState(evt.viewState)}
+        <MapContainer
+          key={`${viewState.latitude}-${viewState.longitude}-${viewState.zoom}`}
+          center={[viewState.latitude, viewState.longitude] as [number, number]}
+          zoom={viewState.zoom}
           style={{ width: '100%', height: '100%' }}
-          mapStyle="mapbox://styles/mapbox/light-v11"
-          mapboxAccessToken={MAPBOX_TOKEN}
-          interactive={false}
+          zoomControl={false}
+          dragging={false}
+          touchZoom={false}
+          doubleClickZoom={false}
+          scrollWheelZoom={false}
+          attributionControl={false}
         >
-          <Marker
-            longitude={gameState.currentStation?.coordinates[0] || 0}
-            latitude={gameState.currentStation?.coordinates[1] || 0}
-          >
-            <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white shadow-lg" />
-          </Marker>
-        </Map>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MapController 
+            center={[viewState.latitude, viewState.longitude] as [number, number]}
+            zoom={viewState.zoom}
+          />
+          {gameState.currentStation && (
+            <Marker
+              position={[
+                gameState.currentStation.coordinates[1],
+                gameState.currentStation.coordinates[0]
+              ] as [number, number]}
+              icon={icon}
+            />
+          )}
+        </MapContainer>
       </div>
 
       <div className="p-4 bg-white shadow-lg">
