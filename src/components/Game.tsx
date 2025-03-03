@@ -1,12 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
-import ReactConfetti from 'react-confetti';
+import { TileLayer, Marker, useMap } from 'react-leaflet';
+import dynamic from 'next/dynamic';
 import { metroStations, INITIAL_ZOOM, ZOOM_DECREASE, MIN_ZOOM } from '../data/stations';
 import type { GameState, ViewState } from '../types/game';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+
+// Dynamically import ReactConfetti with SSR disabled
+const ReactConfetti = dynamic(() => import('react-confetti'), {
+  ssr: false,
+});
 
 // Fix for default marker icons
 interface IconDefault extends L.Icon.Default {
@@ -26,6 +31,11 @@ L.Icon.Default.mergeOptions({
 const icon = L.divIcon({
   className: 'w-6 h-6 bg-red-500 rounded-full border-2 border-white shadow-lg',
   iconSize: [24, 24],
+});
+
+// Also make the Map component client-side only
+const Map = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
+  ssr: false,
 });
 
 // Component to handle map view updates
@@ -54,8 +64,10 @@ const Game = () => {
   });
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     startNewGame();
   }, []);
 
@@ -100,12 +112,16 @@ const Game = () => {
     }
   };
 
+  if (!isMounted) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="h-screen flex flex-col">
       {showConfetti && <ReactConfetti />}
       
       <div className="flex-1 relative">
-        <MapContainer
+        <Map
           key={`${viewState.latitude}-${viewState.longitude}-${viewState.zoom}`}
           center={[viewState.latitude, viewState.longitude] as [number, number]}
           zoom={viewState.zoom}
@@ -134,7 +150,7 @@ const Game = () => {
               icon={icon}
             />
           )}
-        </MapContainer>
+        </Map>
       </div>
 
       <div className="p-4 bg-white shadow-lg">
